@@ -318,24 +318,31 @@ document.getElementById('rsvpForm').addEventListener('submit', function(e) {
   const form = e.target;
   const formData = new FormData(form);
 
-  fetch('https://script.google.com/macros/s/AKfycbxQWVr6SdTnQTAjJNMVRzqA7Vy8Dj1QzyRSBBT407F3bEnlY2p-h-OOiI8zZ1xndF4Z/exec', {
-    method: 'POST',
-    body: formData
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.status === 'ok') {
-      window.location.href = 'https://www.doddswealthadvisors.com/client-appreciation-event-2025-rsvp';
-    } else {
-      alert('Something went wrong. Please try again.');
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    alert('Submission failed. Please contact us directly.');
-  });
+fetch('https://script.google.com/macros/s/AKfycbxQWVr6SdTnQTAjJNMVRzqA7Vy8Dj1QzyRSBBT407F3bEnlY2p-h-OOiI8zZ1xndF4Z/exec', {
+  method: 'POST',
+  body: formData
+})
+.then(async res => {
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Server responded with status ${res.status}: ${errorText}`);
+  }
+  return res.json();
+})
+.then(data => {
+  if (data.status === 'ok') {
+    window.location.href = 'https://www.doddswealthadvisors.com/client-appreciation-event-2025-rsvp';
+  } else {
+    alert('Server responded with an error: ' + data.message);
+  }
+})
+.catch(err => {
+  console.error('Fetch error:', err);
+  alert('Something went wrong:\n' + err.message);
 });
+
 </script>
 </body>
 
 </html>
+
