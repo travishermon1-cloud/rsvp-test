@@ -309,7 +309,7 @@ document.getElementById('party_group').addEventListener('change', (e) => {
 
 window.addEventListener('DOMContentLoaded', toggleOther);
   
-</script>
+<script>
 // Script #2: Submit form via fetch to Google Apps Script
 document.getElementById('rsvpForm').addEventListener('submit', function(e) {
   e.preventDefault();
@@ -339,12 +339,13 @@ document.getElementById('rsvpForm').addEventListener('submit', function(e) {
     console.error('Fetch error:', err);
     alert('Something went wrong:\n' + err.message);
   });
-}); // ← This was missing!
+});
 </script>
   
 </body>
 
 </html>
+
 
 
 
