@@ -1,0 +1,340 @@
+<!doctype html>
+<html>
+<head>
+  <base target="_self">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Event RSVP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+    --gold:#e2ba5d; --ink:#141414; --muted:#6b7280; --line:#e5e7eb; --bg:#f6f7f9; --card:#ffffff; --charcoal:#565656;
+  }
+  * { box-sizing: border-box; }
+  body{
+    font-family: Montserrat, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    margin:0; padding:24px; line-height:1.5; background:var(--bg);
+  }
+  /* Make form controls use the same font as the page */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  textarea,
+  select {
+    font: inherit;            /* family, size, weight, line-height */
+    letter-spacing: inherit;
+    color: inherit;
+  }
+  /* Placeholder matches too */
+  input::placeholder,
+  textarea::placeholder {
+    font: inherit;
+    color: #9aa1a9;           /* or var(--muted) if you prefer */
+  }
+  .card{
+    max-width:780px; margin:0 auto; background:#fff;
+    border:1px solid var(--line); border-radius:16px;
+    box-shadow:0 10px 30px rgba(0,0,0,.06);
+    overflow:hidden;    
+  }
+  .card-body{ 
+    padding:24px;
+  }
+  .divider{ border:0; height:8px; background:var(--gold); }
+  .divider-alt{ background:#565656; /* whatever color you want */ } 
+
+  /* Banner &#8211; edge-to-edge with soft rounding */
+  .banner{
+    display:block; width:100%; height:100%; object-fit:cover;
+    border-top-left-radius:16px; border-top-right-radius:16px;
+  }
+
+  h1{
+    margin:6px 0 14px; font-size:36px; font-weight:700; letter-spacing:-.01em; color:var(--ink);
+  }
+  .field{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:16px 16px 14px;
+    margin:16px 0;
+    box-shadow:0 1px 0 #f0f0f0, 0 2px 12px rgba(0,0,0,.04);
+  }
+  .label{ display:block; font-weight:700; margin:0 0 8px; }
+  .hint{ font-size:12px; color:var(--muted); margin-top:6px; }
+
+  /* Text input */
+  input[type="text"]{
+    width:100%;
+    height:44px;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#fff;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  input[type="text"]::placeholder{ color:#9aa1a9; }
+  input[type="text"]:focus{
+    outline:none;
+    border-color:var(--gold);
+    box-shadow:0 0 0 4px rgba(226,186,93,.25);
+  }
+  /* Put the reveal input on its own row and line it up under the labels */
+  .other-input{
+    min-width: 220px;
+    margin: 6px 0 0 36px;  /* 24px radio + 12px gap = 36px indent */
+    height: 44px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+    font: inherit;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .other-input:focus{
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(226,186,93,.25);
+  }
+
+  /* Radio groups */
+  .options{ display:grid; gap:10px; }
+  /* Comfy option rows */
+  .inline{
+    display:flex;
+    align-items:center;
+    gap:12px;           /* space between circle and label */
+    padding:6px 4px;
+    cursor:pointer;
+  }
+
+  /* Custom radios &#8212; perfectly centered, no "off by a pixel" vibe */
+  .inline input[type="radio"]{
+    -webkit-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
+    position: relative;
+    width: 24px;                 /* even px */
+    height: 24px;                /* even px */
+    border: 3px solid var(--charcoal);  /* whole px ring */
+    border-radius: 50%;
+    background: #fff;
+    margin: 0;
+    display: inline-block;
+    vertical-align: middle;
+    transition: box-shadow .15s, border-color .15s, background-color .15s;
+  }
+
+  .inline input[type="radio"]::after{
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 10px;                 /* inner dot */
+    height: 10px;
+    border-radius: 50%;
+    background: var(--gold);
+    transform: translate(-50%, -50%) scale(0);  /* pixel-perfect center */
+    transition: transform .12s ease-in-out;
+  }
+
+  .inline input[type="radio"]:checked::after{
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .inline input[type="radio"]:focus-visible{
+    box-shadow: 0 0 0 4px rgba(226,186,93,.25);
+    outline: none;
+  }
+
+  /* &#8220;Other&#8221; textbox alignment */
+  #party_other_text{
+    min-width:200px;
+    margin-left:8px;
+    vertical-align:middle;
+  }
+
+  button{
+    margin-top:18px;
+    padding:12px 26px;
+    border:0;
+    border-radius:9999px; /* pill */
+    cursor:pointer;
+    background:var(--gold);
+    color:#fff; /* white text */
+    font-family: Montserrat, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    font-weight:700;
+    text-transform:uppercase; /* SUBMIT in caps */
+    letter-spacing:.06em;
+    box-shadow:0 2px 0 rgba(0,0,0,.08);
+    transition: transform .04s ease, filter .15s ease, box-shadow .15s ease;
+}
+  button:hover{ filter:brightness(.98); }
+  button:active{ transform: translateY(1px); }
+  button:focus-visible{
+    outline:none;
+    box-shadow:0 0 0 4px rgba(226,186,93,.35);
+}
+#rsvpForm button{
+  display:block;
+  width:max-content;
+  margin:18px auto 0;
+  font-size:18px;   /* ~17px &#8212; a touch bigger */
+  padding:14px 28px;     /* optional: keeps the pill looking balanced */
+}
+
+  /* Keep your honeypot hidden */
+.hp{ position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <!-- Optional banner (replace src or remove this line) -->
+    <img class="banner" src="https://static.fmgsuite.com/media/InlineContent/originalSize/29853106-709f-4207-aead-5d1f97e7c982.png" alt="Event Banner">
+
+  <div class="card-body">
+    <h1>Client Appreciation Event 2025 RSVP</h1>
+      <hr class="divider">
+
+    <div class="event-info">
+      <p class="date"><strong>October 16th, 2025</strong></p>
+      <p>Der Dutchman<br>445 S. Jefferson Ave.<br>Plain City, OH 43064</p>
+      <p>Please join us for your choice of lunch or dinner.</p>
+      <p class="note">*Please RSVP only once, for one time slot.</p>
+
+      <p><span class="section"><strong><u>Option 1</u></strong></span><br>
+        Lunch<br>Doors open at 11:30AM<br>Meal at 12:00PM</p>
+
+      <p><span class="section"><strong><u>Option 2</u></strong></span><br>
+        Dinner<br>Doors open at 6:00PM<br>Meal at 6:30PM</p>
+
+      <p><strong><u>Speaker - Bobby Carpenter</u></strong></p>
+      <p>A former Ohio State Buckeye linebacker and first-round NFL draft pick, Bobby spent seven
+        seasons in the league with teams including the Dallas Cowboys and Detroit Lions.</p>
+      <p>Now a respected football analyst and radio host, Bobby brings his trademark energy and insight
+        to every stage. He will share stories from his playing days and break down the major themes of
+        the 2024 National Championship team.</p>
+
+      <p>Join us for a memorable event of stories, insights, and Buckeye pride!</p>
+
+      <p class="contact">
+        Contact us at (937) 592-0200 or
+        <a href="mailto:info@doddswealthadvisors.com">info@doddswealthadvisors.com</a>
+      </p>
+    </div>
+
+    <hr class="divider divider-alt">
+
+    <form method="post"
+      id="rsvpForm"
+      target="_top"
+      novalidate>
+      
+      <!-- Q1: Your name (short answer) -->
+      <div class="field">
+        <label class="label" for="your_name">Your name:</label>
+        <input id="your_name" name="your_name" type="text" required autocomplete="name" placeholder="First Last">
+      </div>
+
+      <!-- Q2: Which event would you like to attend? (radio: lunch, dinner) -->
+      <div class="field">
+        <span class="label" id="event_label">Which event would you like to attend?</span>
+        <div class="options" id="event_group" role="radiogroup" aria-labelledby="event_label">
+          <label class="inline"><input type="radio" name="event" value="Lunch" required><span>Lunch</span></label>
+          <label class="inline"><input type="radio" name="event" value="Dinner"><span>Dinner</span></label>
+        </div>
+      </div> <!-- end Q2 field -->
+
+      <!-- Q3: How many people will be in your party? (radio 1&#8211;4, Other + textbox) -->
+      <div class="field">
+        <span class="label">How many people will be in your party?</span>
+
+        <div class="options" id="party_group">
+          <label class="inline"><input type="radio" name="party_size" value="1" required><span>1</span></label>
+          <label class="inline"><input type="radio" name="party_size" value="2"><span>2</span></label>
+          <label class="inline"><input type="radio" name="party_size" value="3"><span>3</span></label>
+          <label class="inline"><input type="radio" name="party_size" value="4"><span>4</span></label>
+
+          <!-- Other option (textbox lives OUTSIDE the label) -->
+          <label class="inline">
+            <input type="radio" name="party_size" value="Other" id="party_other_radio"><span>Other</span>
+          </label>
+          <input
+            type="text"
+            id="party_other_text"
+            name="party_size_other"
+            placeholder="Please specify"
+            style="display:none"
+            class="other-input"
+            aria-label="Specify other party size"
+          >
+        </div>
+      </div>
+
+
+      <!-- Q4: Names for name tags (short answer) -->
+      <div class="field">
+        <label class="label" for="attendees_names">
+          Please provide the first and last names of all your party's attendees.
+        </label>
+        <div class="hint">This will be printed on your event name tags. Separate names with commas.</div>
+        <input id="attendees_names" name="attendees_names" type="text" required placeholder="e.g., Jane Doe, John Doe">
+      </div>
+
+      <!-- Honeypot -->
+      <input class="hp" type="text" name="website" autocomplete="off" tabindex="-1">
+
+      <button type="submit">SUBMIT</button>
+    </form>
+
+  </div> <!-- /.card-body -->
+</div>   <!-- /.card -->
+
+<script>
+// Script #1: Show/hide "Other" party size input
+const partyOtherRadio = document.getElementById('party_other_radio');
+const partyOtherText  = document.getElementById('party_other_text');
+
+function toggleOther() {
+  const otherSelected = partyOtherRadio.checked;
+  partyOtherText.style.display = otherSelected ? 'inline-block' : 'none';
+  partyOtherText.toggleAttribute('required', otherSelected);
+  if (otherSelected) partyOtherText.focus();
+}
+
+document.getElementById('party_group').addEventListener('change', (e) => {
+  if (e.target.name === 'party_size') toggleOther();
+});
+
+window.addEventListener('DOMContentLoaded', toggleOther);
+</script>
+
+<script>
+// Script #2: Submit form via fetch to Google Apps Script
+document.getElementById('rsvpForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const form = e.target;
+  const formData = new FormData(form);
+
+  fetch('https://script.google.com/macros/s/AKfycby-AF2LClI_6JM_DzY6thZzc_pPo77BT3eHpcjl3vbj6QCUIHbPeiEV9c5r7v-qycSG/exec', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === 'ok') {
+      window.location.href = 'https://www.doddswealthadvisors.com/client-appreciation-event-2025-rsvp';
+    } else {
+      alert('Something went wrong. Please try again.');
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Submission failed. Please contact us directly.');
+  });
+});
+</script>
+</body>
+</html>
